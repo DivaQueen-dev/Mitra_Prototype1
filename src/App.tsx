@@ -29,6 +29,8 @@ import Students from "./pages/admin/Students";
 import AdminResources from "./pages/admin/Resources";
 import Forum from "./pages/admin/Forum";
 import Reports from "./pages/admin/Reports";
+import Notifications from "./pages/admin/Notifications";
+import Settings from "./pages/admin/Settings";
 
 
 
@@ -67,6 +69,8 @@ const App = () => {
         <Route path="resources" element={<AdminResources />} />
         <Route path="forum" element={<Forum />} />
         <Route path="reports" element={<Reports />} />
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="settings" element={<Settings />} />
       </Route>
       
       <Route path="*" element={<NotFound />} />
