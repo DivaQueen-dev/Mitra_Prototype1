@@ -1,20 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Mail, Lock } from 'lucide-react';
+import { Heart, Mail, Lock, GraduationCap, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Link, useNavigate } from 'react-router-dom';
 
 const SignIn: React.FC = () => {
+  const [userType, setUserType] = useState<'student' | 'admin'>('student');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, user } = useAuth();
+  const { signIn: studentSignIn, user } = useAuth();
+  const { signIn: adminSignIn, admin } = useAdminAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -22,23 +25,35 @@ const SignIn: React.FC = () => {
     if (user) {
       navigate('/app/home');
     }
-  }, [user, navigate]);
+    if (admin) {
+      navigate('/admin/overview');
+    }
+  }, [user, admin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await signIn(formData.email, formData.password);
-      toast({
-        title: "Welcome back!",
-        description: "You've successfully signed in to Mitra.",
-      });
-      navigate('/app/home');
+      if (userType === 'student') {
+        await studentSignIn(formData.email, formData.password);
+        toast({
+          title: "Welcome back!",
+          description: "You've successfully signed in to Mitra.",
+        });
+        navigate('/app/home');
+      } else {
+        await adminSignIn(formData.email, formData.password);
+        toast({
+          title: "Admin Access Granted",
+          description: "Welcome to the MITRA Admin Dashboard.",
+        });
+        navigate('/admin/overview');
+      }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Something went wrong. Please try again.",
+        description: "Invalid credentials. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -53,6 +68,13 @@ const SignIn: React.FC = () => {
     }));
   };
 
+  const handleForgotPassword = () => {
+    toast({
+      title: "Password Reset",
+      description: "Password reset link has been sent to your email.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <motion.div
@@ -62,8 +84,8 @@ const SignIn: React.FC = () => {
         className="w-full max-w-lg"
       >
         {/* Header */}
-        <div className="text-center mb-10">
-          <Link to="/" className="inline-block mb-8">
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-block mb-6">
             <motion.div 
               whileHover={{ scale: 1.05, rotate: 5 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -73,7 +95,35 @@ const SignIn: React.FC = () => {
             </motion.div>
           </Link>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent mb-3">Welcome back!</h1>
-          <p className="text-slate-600 text-lg font-medium">Continue your wellness journey with Mitra</p>
+          <p className="text-slate-600 text-lg font-medium">Sign in to your account</p>
+        </div>
+
+        {/* User Type Selector */}
+        <div className="flex gap-3 mb-6">
+          <button
+            onClick={() => setUserType('student')}
+            className={`flex-1 p-4 rounded-2xl border-2 transition-all duration-300 ${
+              userType === 'student'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-transparent shadow-lg shadow-blue-500/25 scale-[1.02]'
+                : 'bg-white/70 backdrop-blur-sm text-slate-600 border-slate-200 hover:border-blue-300'
+            }`}
+          >
+            <GraduationCap className="w-6 h-6 mx-auto mb-2" />
+            <div className="font-semibold">Student</div>
+            <div className="text-xs opacity-80 mt-1">Access your wellness dashboard</div>
+          </button>
+          <button
+            onClick={() => setUserType('admin')}
+            className={`flex-1 p-4 rounded-2xl border-2 transition-all duration-300 ${
+              userType === 'admin'
+                ? 'bg-gradient-to-r from-emerald-600 to-blue-600 text-white border-transparent shadow-lg shadow-emerald-500/25 scale-[1.02]'
+                : 'bg-white/70 backdrop-blur-sm text-slate-600 border-slate-200 hover:border-emerald-300'
+            }`}
+          >
+            <Shield className="w-6 h-6 mx-auto mb-2" />
+            <div className="font-semibold">Admin</div>
+            <div className="text-xs opacity-80 mt-1">Manage institution dashboard</div>
+          </button>
         </div>
 
         {/* Form Card */}
@@ -86,7 +136,7 @@ const SignIn: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-7">
             <div className="space-y-3">
               <Label htmlFor="email" className="text-sm font-semibold text-slate-700 tracking-wide">
-                Email Address
+                {userType === 'student' ? 'Email Address' : 'Admin Email'}
               </Label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5 transition-colors group-focus-within:text-blue-600" />
@@ -98,7 +148,7 @@ const SignIn: React.FC = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   className="pl-12 h-14 bg-white/60 border-slate-200/50 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 text-slate-700 placeholder:text-slate-400 shadow-sm"
-                  placeholder="Enter your email address"
+                  placeholder={userType === 'student' ? 'student@university.edu' : 'admin@institution.edu'}
                 />
               </div>
             </div>
@@ -108,7 +158,11 @@ const SignIn: React.FC = () => {
                 <Label htmlFor="password" className="text-sm font-semibold text-slate-700 tracking-wide">
                   Password
                 </Label>
-                <button type="button" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                <button 
+                  type="button" 
+                  onClick={handleForgotPassword}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
                   Forgot password?
                 </button>
               </div>
@@ -130,7 +184,11 @@ const SignIn: React.FC = () => {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full h-14 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-800 text-white font-semibold text-lg rounded-2xl shadow-xl shadow-blue-500/25 hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300 hover:scale-[1.02]"
+              className={`w-full h-14 font-semibold text-lg rounded-2xl shadow-xl transition-all duration-300 hover:scale-[1.02] ${
+                userType === 'student'
+                  ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-800 shadow-blue-500/25 hover:shadow-blue-500/40'
+                  : 'bg-gradient-to-r from-emerald-600 via-blue-600 to-purple-700 hover:from-emerald-700 hover:via-blue-700 hover:to-purple-800 shadow-emerald-500/25 hover:shadow-emerald-500/40'
+              } text-white`}
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
@@ -138,7 +196,7 @@ const SignIn: React.FC = () => {
                   Signing you in...
                 </div>
               ) : (
-                'Sign In'
+                `Sign In as ${userType === 'student' ? 'Student' : 'Admin'}`
               )}
             </Button>
           </form>

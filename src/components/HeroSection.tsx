@@ -99,15 +99,15 @@ const HeroSection = () => {
             >
               <Button
                 onClick={handleGetStarted}
-                className="btn-hero text-lg px-8 py-4"
+                className="btn-luxury text-lg px-8 py-4"
               >
-                Sign Up Free
+                Get Started
               </Button>
               <Button
                 onClick={handleTryDemo}
                 className="btn-outline-hero text-lg px-8 py-4"
               >
-                Try Demo
+                Explore Features
               </Button>
             </motion.div>
 

@@ -104,15 +104,6 @@ const Navbar = () => {
                   >
                     Get Started
                   </Button>
-                  <Link to="/admin/signin">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="ml-2 text-xs"
-                    >
-                      Admin
-                    </Button>
-                  </Link>
                 </div>
               )}
             </div>
