@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Menu, X, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { Link } from 'react-router-dom';
 import AuthModal from './AuthModal';
 import Logo from './Logo';
 import ThemeToggle from './ThemeToggle';
@@ -103,6 +104,15 @@ const Navbar = () => {
                   >
                     Get Started
                   </Button>
+                  <Link to="/admin/signin">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="ml-2 text-xs"
+                    >
+                      Admin
+                    </Button>
+                  </Link>
                 </div>
               )}
             </div>
