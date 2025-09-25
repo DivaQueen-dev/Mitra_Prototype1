@@ -135,9 +135,27 @@ class StudentService {
     }
   }
 
-  getAllStudents(): Student[] {
+  // Function to anonymize student name
+  private anonymizeName(name: string, id: string): string {
+    // Generate consistent anonymous ID based on original ID
+    const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return `Student-${hash % 10000}`;
+  }
+
+  getAllStudents(anonymize: boolean = false): Student[] {
     const data = localStorage.getItem(this.STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    const students = data ? JSON.parse(data) : [];
+    
+    // Anonymize student data if requested (for admin view)
+    if (anonymize) {
+      return students.map((student: Student) => ({
+        ...student,
+        name: this.anonymizeName(student.name, student.id),
+        email: `${student.id}@student.edu` // Generic email
+      }));
+    }
+    
+    return students;
   }
 
   getStudentById(id: string): Student | null {

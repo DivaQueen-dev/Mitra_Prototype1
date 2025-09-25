@@ -79,7 +79,8 @@ const Students: React.FC = () => {
   }, [students, searchTerm, filterDepartment, filterRisk]);
 
   const loadStudents = () => {
-    const data = studentService.getAllStudents();
+    // Get anonymized student data for admin view
+    const data = studentService.getAllStudents(true);
     setStudents(data);
   };
 
